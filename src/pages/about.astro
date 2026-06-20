@@ -1,11 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { bio, experience, education, certifications } from '../data/cv';
+import { bio, skills, experience, education, certifications } from '../data/cv';
 ---
 
 <BaseLayout title="About" description="Background, experience, education, and certifications.">
   <h1>About</h1>
   {bio.map((para) => <p>{para}</p>)}
+
+  {skills.length > 0 && (
+    <div class="skill-chips">
+      {skills.map((skill) => <span class="chip">{skill}</span>)}
+    </div>
+  )}
 
   {experience.length > 0 && (
     <>
@@ -59,7 +65,7 @@ import { bio, experience, education, certifications } from '../data/cv';
                 cert.name
               )}
             </span>
-            <span class="cert-list__meta">{cert.issuer} · {cert.year}</span>
+            <span class="cert-list__meta">{cert.issuer}{cert.year && <> · {cert.year}</>}</span>
           </li>
         ))}
       </ul>
