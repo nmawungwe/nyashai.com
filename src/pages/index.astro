@@ -13,17 +13,19 @@ const published = <T extends { data: { draft: boolean; date: Date } }>(items: T[
 const recentPosts = published(await getCollection('blog')).slice(0, 3);
 const recentReviews = published(await getCollection('reviews')).slice(0, 3);
 
-// Edit these to reflect your real work / projects.
+// Edit these to reflect your real work / projects. Add a `url` to make a card a link.
 const projects = [
-  {
-    title: 'VhenekAI',
-    description:
-      'Offline-first, on-device AI bringing expert-level STEM education to underserved African communities.',
-  },
   {
     title: 'goveranAI',
     description:
       'A WhatsApp-based AI marketplace connecting Zimbabwean farmers with buyers — plus Market Radar for early price signals.',
+    url: 'https://www.goveranai.com/en',
+  },
+  {
+    title: 'VhenekAI',
+    description:
+      'Offline-first, on-device AI bringing expert-level STEM education to underserved African communities.',
+    url: 'https://vhenekai.org/',
   },
 ];
 ---
@@ -49,10 +51,10 @@ const projects = [
   <h2>What I'm working on</h2>
   <div class="cards">
     {projects.map((p) => (
-      <div class="card">
-        <h3>{p.title}</h3>
+      <a class="card" href={p.url} target="_blank" rel="noopener noreferrer">
+        <h3>{p.title} ↗</h3>
         <p>{p.description}</p>
-      </div>
+      </a>
     ))}
   </div>
 
