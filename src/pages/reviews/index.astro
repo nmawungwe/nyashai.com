@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, stars } from '../../utils';
+
+const reviews = (await getCollection('reviews'))
+  .filter((r) => !r.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Reviews" description="Reviews and notes on books, papers, and blogs I've read.">
+  <h1>Reviews</h1>
+  <p class="hero__tagline">Notes and takes on the books, papers, and blogs I read.</p>
+
+  {reviews.length === 0 ? (
+    <p>No reviews yet — add one in <code>src/content/reviews/</code>.</p>
+  ) : (
+    <ul class="post-list">
+      {reviews.map((review) => (
+        <li>
+          <div class="post-item__meta">
+            <span class="chip">{review.data.kind}</span>
+            {review.data.author && <span>{review.data.author}</span>}
+            <time datetime={review.data.date.toISOString()}>{formatDate(review.data.date)}</time>
+            {review.data.rating && <span class="rating" aria-label={`${review.data.rating} out of 5`}>{stars(review.data.rating)}</span>}
+          </div>
+          <h3 class="post-item__title"><a href={`/reviews/${review.id}`}>{review.data.title}</a></h3>
+          <p class="post-item__summary">{review.data.summary}</p>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

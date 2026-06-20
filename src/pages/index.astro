@@ -1,0 +1,92 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../site';
+import { formatDate } from '../utils';
+
+// Latest 3 of each, newest first, drafts excluded.
+const published = <T extends { data: { draft: boolean; date: Date } }>(items: T[]) =>
+  items
+    .filter((i) => !i.data.draft)
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const recentPosts = published(await getCollection('blog')).slice(0, 3);
+const recentReviews = published(await getCollection('reviews')).slice(0, 3);
+
+// Edit these to reflect your real work / projects.
+const projects = [
+  {
+    title: 'GoveranAI',
+    description: 'Exploring AI tooling for governance and decision-making.',
+  },
+  {
+    title: 'Open-source & experiments',
+    description: 'Side projects in AI, finance, and developer tooling.',
+  },
+];
+---
+
+<BaseLayout>
+  <section class="hero">
+    <img class="hero__photo" src="/profile.jpg" alt={site.name} width="96" height="96" />
+    <div>
+      <h1>Hi, I'm Nyasha.</h1>
+      <p class="hero__tagline">{site.tagline}</p>
+    </div>
+  </section>
+
+  <p style="margin-top:1.5rem">
+    I'm a developer and writer exploring technology, finance, and personal growth.
+    I spend my time building things, reading widely, and writing down what I learn —
+    you'll find my <a href="/reviews">reviews</a> of books, papers and blogs, and my own
+    <a href="/blog">writing</a> here. For my background, experience, and certifications, see
+    <a href="/about">about</a>. <em>(Edit this intro in <code>src/pages/index.astro</code>.)</em>
+  </p>
+
+  <h2>What I'm working on</h2>
+  <div class="cards">
+    {projects.map((p) => (
+      <div class="card">
+        <h3>{p.title}</h3>
+        <p>{p.description}</p>
+      </div>
+    ))}
+  </div>
+
+  {recentPosts.length > 0 && (
+    <>
+      <h2>Latest writing</h2>
+      <ul class="post-list">
+        {recentPosts.map((post) => (
+          <li>
+            <div class="post-item__meta">
+              <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+            </div>
+            <h3 class="post-item__title"><a href={`/blog/${post.id}`}>{post.data.title}</a></h3>
+            <p class="post-item__summary">{post.data.description}</p>
+          </li>
+        ))}
+      </ul>
+      <p><a href="/blog">All posts →</a></p>
+    </>
+  )}
+
+  {recentReviews.length > 0 && (
+    <>
+      <h2>Recent reviews</h2>
+      <ul class="post-list">
+        {recentReviews.map((review) => (
+          <li>
+            <div class="post-item__meta">
+              <span class="chip">{review.data.kind}</span>
+              <time datetime={review.data.date.toISOString()}>{formatDate(review.data.date)}</time>
+            </div>
+            <h3 class="post-item__title"><a href={`/reviews/${review.id}`}>{review.data.title}</a></h3>
+            <p class="post-item__summary">{review.data.summary}</p>
+          </li>
+        ))}
+      </ul>
+      <p><a href="/reviews">All reviews →</a></p>
+    </>
+  )}
+</BaseLayout>

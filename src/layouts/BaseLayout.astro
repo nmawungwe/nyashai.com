@@ -1,0 +1,100 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import { site } from '../site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : site.name;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Open Graph / social cards -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Apply the saved theme before paint to avoid a flash of the wrong mode. -->
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'light' || t === 'dark') {
+            document.documentElement.dataset.theme = t;
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <Nav />
+    <main class="wrap">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <div class="social">
+          {site.socials.map((s) => (
+            <a href={s.href} target={s.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener noreferrer">
+              {s.label}
+            </a>
+          ))}
+        </div>
+        <p>© {year} {site.name}</p>
+      </div>
+    </footer>
+
+    <!-- Theme toggle: flips light/dark, persists the choice, syncs the icon. -->
+    <script is:inline>
+      (function () {
+        var btn = document.querySelector('.theme-toggle');
+        if (!btn) return;
+        var icon = btn.querySelector('.theme-toggle__icon');
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+        function current() {
+          var set = document.documentElement.dataset.theme;
+          if (set === 'light' || set === 'dark') return set;
+          return mq.matches ? 'dark' : 'light';
+        }
+        function render() {
+          var c = current();
+          // Show the mode you'd switch TO.
+          icon.textContent = c === 'dark' ? '☀️' : '🌙';
+          btn.setAttribute(
+            'aria-label',
+            c === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
+          );
+        }
+        btn.addEventListener('click', function () {
+          var next = current() === 'dark' ? 'light' : 'dark';
+          document.documentElement.dataset.theme = next;
+          try { localStorage.setItem('theme', next); } catch (e) {}
+          render();
+        });
+        // Keep the icon correct if the OS theme changes while on "system".
+        mq.addEventListener('change', render);
+        render();
+      })();
+    </script>
+  </body>
+</html>

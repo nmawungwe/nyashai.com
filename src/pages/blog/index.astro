@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../utils';
+
+const posts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Blog" description="My writing and thoughts on technology, finance, and learning.">
+  <h1>Blog</h1>
+  <p class="hero__tagline">Thoughts on technology, finance, and learning.</p>
+
+  {posts.length === 0 ? (
+    <p>No posts yet — add one in <code>src/content/blog/</code>.</p>
+  ) : (
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li>
+          <div class="post-item__meta">
+            <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+            {post.data.tags.map((tag) => <span class="chip">{tag}</span>)}
+          </div>
+          <h3 class="post-item__title"><a href={`/blog/${post.id}`}>{post.data.title}</a></h3>
+          <p class="post-item__summary">{post.data.description}</p>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

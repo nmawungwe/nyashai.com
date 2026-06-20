@@ -1,0 +1,36 @@
+---
+import { site, nav } from '../site';
+const { pathname } = Astro.url;
+// Mark the active tab. "/" only matches home exactly; others match their section.
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="wrap">
+    <nav class="nav" aria-label="Primary">
+      <a class="nav__brand" href="/">{site.name}</a>
+      <div class="nav__right">
+        <div class="nav__links">
+          {nav.map((item) => (
+            <a
+              href={item.href}
+              class={isActive(item.href) ? 'is-active' : ''}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+        <button
+          class="theme-toggle"
+          type="button"
+          aria-label="Toggle dark mode"
+          title="Toggle light / dark mode"
+        >
+          <span class="theme-toggle__icon" aria-hidden="true">🌙</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>

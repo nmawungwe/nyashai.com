@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { bio, experience, education, certifications } from '../data/cv';
+---
+
+<BaseLayout title="About" description="Background, experience, education, and certifications.">
+  <h1>About</h1>
+  {bio.map((para) => <p>{para}</p>)}
+
+  {experience.length > 0 && (
+    <>
+      <h2>Experience</h2>
+      {experience.map((job) => (
+        <div class="cv-entry">
+          <div class="cv-entry__head">
+            <span class="cv-entry__title">{job.role}</span>
+            <span class="cv-entry__period">{job.period}</span>
+          </div>
+          <p class="cv-entry__org">
+            {job.org}{job.location && <> · {job.location}</>}
+          </p>
+          {job.highlights && job.highlights.length > 0 && (
+            <ul class="cv-entry__highlights">
+              {job.highlights.map((h) => <li>{h}</li>)}
+            </ul>
+          )}
+        </div>
+      ))}
+    </>
+  )}
+
+  {education.length > 0 && (
+    <>
+      <h2>Education</h2>
+      {education.map((ed) => (
+        <div class="cv-entry">
+          <div class="cv-entry__head">
+            <span class="cv-entry__title">{ed.qualification}</span>
+            <span class="cv-entry__period">{ed.period}</span>
+          </div>
+          <p class="cv-entry__org">
+            {ed.institution}{ed.detail && <> · {ed.detail}</>}
+          </p>
+        </div>
+      ))}
+    </>
+  )}
+
+  {certifications.length > 0 && (
+    <>
+      <h2>Certifications</h2>
+      <ul class="cert-list">
+        {certifications.map((cert) => (
+          <li>
+            <span class="cert-list__name">
+              {cert.link ? (
+                <a href={cert.link} target="_blank" rel="noopener noreferrer">{cert.name} ↗</a>
+              ) : (
+                cert.name
+              )}
+            </span>
+            <span class="cert-list__meta">{cert.issuer} · {cert.year}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+</BaseLayout>
