@@ -108,6 +108,7 @@ export interface Certification {
 }
 
 export const certifications: Certification[] = [
+  { name: 'Future of AI', issuer: 'BlueDot Impact' },
   { name: 'Deep Learning Specialization', issuer: 'DeepLearning.AI' },
   { name: 'Introduction to TensorFlow for AI, ML & Deep Learning', issuer: 'DeepLearning.AI' },
   { name: 'ACI Dealing Certificate', issuer: 'ACI Financial Markets Association', year: '2025' },
