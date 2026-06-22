@@ -6,10 +6,10 @@
 :root {
   /* Theme follows the OS by default; the top-right toggle overrides it via
      [data-theme] and persists the choice in localStorage. Each color is
-     defined once with light-dark(light, dark) — no duplicated media query. */
+     defined once with light-dark(light, dark); no duplicated media query. */
   color-scheme: light dark;
 
-  /* palette — light value first, dark value second */
+  /* palette: light value first, dark value second */
   --bg: light-dark(#faf6f0, #1f1b18);          /* warm cream / deep espresso */
   --surface: light-dark(#f3ece1, #2a2520);     /* card surface */
   --text: light-dark(#2e2a26, #ece3d8);        /* primary text */

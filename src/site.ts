@@ -4,7 +4,7 @@ export const site = {
   name: 'Nyasha Mawungwe',
   tagline: 'AI/ML Builder · Data Analyst · Pursuing AI Safety',
   description:
-    'Personal site of Nyasha Mawungwe — AI/ML builder and data analyst moving into AI safety. Writing, reviews, and notes on machine learning and learning in public.',
+    'Personal site of Nyasha Mawungwe: AI/ML builder and data analyst moving into AI safety. Writing, reviews, and notes on machine learning and learning in public.',
   socials: [
     { label: 'GitHub', href: 'https://github.com/nmawungwe' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/nyasha22' },

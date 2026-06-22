@@ -13,7 +13,7 @@ const posts = (await getCollection('blog'))
   <p class="hero__tagline">Thoughts on technology, finance, and learning.</p>
 
   {posts.length === 0 ? (
-    <p>No posts yet — add one in <code>src/content/blog/</code>.</p>
+    <p>No posts yet. Add one in <code>src/content/blog/</code>.</p>
   ) : (
     <ul class="post-list">
       {posts.map((post) => (

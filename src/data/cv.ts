@@ -3,7 +3,7 @@
 
 // A short bio shown at the top of the About page.
 export const bio = [
-  "I'm a data analyst with a chemical-engineering foundation and a self-taught grounding in machine learning and deep learning. Right now I'm helping build production AI products while moving fully into AI safety — to me, one of the most consequential problems of the coming decades.",
+  "I'm a data analyst with a chemical-engineering foundation and a self-taught grounding in machine learning and deep learning. Right now I'm helping build production AI products while moving fully into AI safety, to me one of the most consequential problems of the coming decades.",
   'I pair analytical rigour with hands-on ML and an entrepreneurial track record of shipping technology that serves real communities. Based in Johannesburg, South Africa.',
 ];
 
@@ -36,16 +36,16 @@ export const experience: ExperienceEntry[] = [
     period: 'Jan 2026 – Present',
     highlights: [
       'Helping build an offline-first platform that delivers expert-level STEM education through on-device AI to underserved African communities.',
-      'Prototyping privacy-preserving, curriculum-aligned tools (offline AI chat, adaptive learner profiling) that run on low-end devices with no internet — learner data stays on-device and the tool supports teachers rather than replacing them.',
+      'Prototyping privacy-preserving, curriculum-aligned tools (offline AI chat, adaptive learner profiling) that run on low-end devices with no internet, keeping learner data on-device and supporting teachers rather than replacing them.',
     ],
   },
   {
     role: 'Member of Technical Staff · Builder',
-    org: 'goveranAI — Zimbabwe Fresh Produce Marketplace',
+    org: 'goveranAI, Zimbabwe Fresh Produce Marketplace',
     period: 'Jan 2026 – Present',
     location: 'Harare, Zimbabwe',
     highlights: [
-      'Helping build a WhatsApp-based marketplace that uses AI to connect Zimbabwean farmers directly with buyers — listing, matching, and trust/safety workflows, no app required.',
+      'Helping build a WhatsApp-based marketplace that uses AI to connect Zimbabwean farmers directly with buyers: listing, matching, and trust/safety workflows, no app required.',
       'Built Market Radar, an AI tool giving farmers early warning of produce price moves; every alert cites its sources and a counter-signal, prioritising calibration over overconfident predictions.',
     ],
   },
@@ -54,7 +54,7 @@ export const experience: ExperienceEntry[] = [
     org: 'Elenjical Solutions',
     period: '2025 – Present',
     highlights: [
-      'Provide production support for the Murex trading platform — resolving ~5 daily trade-booking and lifecycle issues at 99.9% uptime.',
+      'Provide production support for the Murex trading platform, resolving ~5 daily trade-booking and lifecycle issues at 99.9% uptime.',
       'Automate P&L and risk data feeds in Python/SQL, cutting manual reconciliation time 10–15%.',
     ],
   },

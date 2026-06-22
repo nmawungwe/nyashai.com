@@ -5,7 +5,7 @@ author: "Dario Amodei"
 rating: 5
 date: 2026-06-22
 link: "https://darioamodei.com/essay/the-adolescence-of-technology"
-summary: "Dario Amodei on the risks and remedies of advanced AI — biosecurity, Constitutional AI, interpretability, and export controls — and what stood out to me."
+summary: "Dario Amodei on the risks and remedies of advanced AI: biosecurity, Constitutional AI, interpretability, and export controls, plus what stood out to me."
 ---
 
 It has taken me quite some time to finally read one of the more interesting blog posts from one of the AI lab leaders, Dario Amodei. The blog post was *The Adolescence of Technology*.
