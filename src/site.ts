@@ -9,7 +9,7 @@ export const site = {
     { label: 'GitHub', href: 'https://github.com/nmawungwe' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/nyasha22' },
     { label: 'Twitter', href: 'https://twitter.com/nyasha_mawungwe' },
-    { label: 'Email', href: 'mailto:nmawungwe@gmail.com' },
+    { label: 'Email', href: 'https://mail.google.com/mail/?view=cm&fs=1&to=nmawungwe@gmail.com' },
   ],
 } as const;
 
