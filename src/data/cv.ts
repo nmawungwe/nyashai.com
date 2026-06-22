@@ -50,7 +50,7 @@ export const experience: ExperienceEntry[] = [
     ],
   },
   {
-    role: 'Junior Analyst',
+    role: 'Analyst',
     org: 'Elenjical Solutions',
     period: '2025 – Present',
     highlights: [
