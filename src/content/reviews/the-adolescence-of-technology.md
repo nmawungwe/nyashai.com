@@ -3,7 +3,7 @@ title: "The Adolescence of Technology"
 kind: blog
 author: "Dario Amodei"
 rating: 5
-date: 2026-06-22
+date: 2026-02-08
 link: "https://darioamodei.com/essay/the-adolescence-of-technology"
 summary: "Dario Amodei on the risks and remedies of advanced AI: biosecurity, Constitutional AI, interpretability, and export controls, plus what stood out to me."
 ---
