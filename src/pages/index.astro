@@ -1,5 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
+import { Picture } from 'astro:assets';
+import profileImage from '../assets/profile.jpg';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../site';
 import { formatDate } from '../utils';
@@ -32,7 +34,23 @@ const projects = [
 
 <BaseLayout>
   <section class="hero">
-    <img class="hero__photo" src="/profile.jpg" alt={site.name} width="96" height="96" />
+    <Picture
+      class="hero__photo"
+      src={profileImage}
+      alt={site.name}
+      width={96}
+      height={96}
+      widths={[96, 192, 288]}
+      formats={['avif', 'webp']}
+      fallbackFormat="jpg"
+      fit="cover"
+      position="center"
+      quality={72}
+      sizes="96px"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+    />
     <div>
       <h1>Hi, I'm Nyasha.</h1>
       <p class="hero__tagline">{site.tagline}</p>

@@ -78,6 +78,12 @@ a {
 }
 a:hover { text-decoration: underline; }
 
+main :where(p, li, blockquote) > a {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
 p { margin: 0 0 1rem; }
 
 hr {
@@ -328,4 +334,15 @@ main { padding-block: 2.5rem; }
 @media (max-width: 34rem) {
   .cards { grid-template-columns: 1fr; }
   h1 { font-size: 1.7rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body,
+  .theme-toggle {
+    transition-duration: 0.01ms;
+  }
 }

@@ -58,7 +58,7 @@ Your review in Markdown here.
 - **Name, tagline, social links:** `src/site.ts`
 - **Home intro & projects:** `src/pages/index.astro`
 - **Colors & fonts:** `src/styles/global.css` (CSS variables at the top)
-- **Profile photo:** replace `public/profile.jpg`
+- **Profile photo:** replace `src/assets/profile.jpg`
 - **Domain (for canonical URLs):** `astro.config.mjs`
 
 ## Deploy

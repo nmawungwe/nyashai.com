@@ -92,7 +92,11 @@ const year = new Date().getFullYear();
           render();
         });
         // Keep the icon correct if the OS theme changes while on "system".
-        mq.addEventListener('change', render);
+        if (mq.addEventListener) {
+          mq.addEventListener('change', render);
+        } else if (mq.addListener) {
+          mq.addListener(render);
+        }
         render();
       })();
     </script>
