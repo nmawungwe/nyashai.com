@@ -1,115 +1,84 @@
 ---
-import { getCollection } from 'astro:content';
-import { Picture } from 'astro:assets';
-import profileImage from '../assets/profile.jpg';
+import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { site } from '../site';
-import { formatDate } from '../utils';
+import PavilionPanels from '../components/PavilionPanels.astro';
+import desktop from '../assets/pavilion/garden-desktop.webp';
+import mobile from '../assets/pavilion/garden-mobile.webp';
+import '../styles/pavilion.css';
 
-// Latest 3 of each, newest first, drafts excluded.
-const published = <T extends { data: { draft: boolean; date: Date } }>(items: T[]) =>
-  items
-    .filter((i) => !i.data.draft)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-
-const recentPosts = published(await getCollection('blog')).slice(0, 3);
-const recentReviews = published(await getCollection('reviews')).slice(0, 3);
-
-// Edit these to reflect your real work / projects. Add a `url` to make a card a link.
-const projects = [
-  {
-    title: 'goveranAI',
-    description:
-      'A WhatsApp-based AI marketplace connecting Zimbabwean farmers with buyers, plus Market Radar for early price signals.',
-    url: 'https://www.goveranai.com/en',
-  },
-  {
-    title: 'VhenekAI',
-    description:
-      'Offline-first, on-device AI bringing expert-level STEM education to underserved African communities.',
-    url: 'https://vhenekai.org/',
-  },
+const responsive = async (src: typeof desktop, widths: number[]) => {
+  const sizes = [...new Set([...widths.filter((width) => width < src.width), src.width])];
+  const images = await Promise.all(sizes.map((width) => getImage({ src, width, format: 'webp', quality: 85 })));
+  return {
+    src: images.at(-1)!.src,
+    srcset: images.map((image, index) => `${image.src} ${sizes[index]}w`).join(', '),
+  };
+};
+const [landscape, portrait] = await Promise.all([
+  responsive(desktop, [960, 1440]),
+  responsive(mobile, [480, 720]),
+]);
+const destinations = [
+  { id: 'projects', label: 'Projects', href: '/projects/' },
+  { id: 'writing', label: 'Writing', href: '/blog/' },
+  { id: 'reviews', label: 'Reviews', href: '/reviews/' },
 ];
 ---
 
-<BaseLayout>
-  <section class="hero">
-    <Picture
-      class="hero__photo"
-      src={profileImage}
-      alt={site.name}
-      width={96}
-      height={96}
-      widths={[96, 192, 288]}
-      formats={['avif', 'webp']}
-      fallbackFormat="jpg"
-      fit="cover"
-      position="center"
-      quality={72}
-      sizes="96px"
-      loading="eager"
-      decoding="async"
-      fetchpriority="high"
-    />
-    <div>
-      <h1>Hi, I'm Nyasha.</h1>
-      <p class="hero__tagline">{site.tagline}</p>
+<BaseLayout immersive description="Nyasha Mawungwe. Building goveranAI and VhenekAI. Projects, writing, and reviews.">
+  <link slot="head" rel="preload" href="/fonts/instrument-serif-regular.ttf" as="font" type="font/ttf" crossorigin />
+
+  <section class="pavilion" aria-labelledby="greeting" style={`--desktop-ratio: ${desktop.width / desktop.height}; --mobile-ratio: ${mobile.width / mobile.height};`}>
+    <div class="scene-viewport">
+      <div class="scene-plane">
+        <picture>
+          <source media="(max-aspect-ratio: 1/1)" srcset={portrait.srcset} sizes="100vw" width={mobile.width} height={mobile.height} />
+          <img src={landscape.src} srcset={landscape.srcset} sizes="100vw" width={desktop.width} height={desktop.height} alt="A sunlit garden pavilion, with a laptop on a wooden table, an open notebook, and books on a reading bench." fetchpriority="high" loading="eager" decoding="async" />
+        </picture>
+
+        <nav class="scene-links" aria-label="Explore my work">
+          {destinations.map((item) => (
+            <a class={`scene-hotspot hotspot-${item.id}`} href={item.href} data-panel={item.id}>
+              <span class="hotspot-label">{item.label}</span>
+              <span class="hotspot-line" aria-hidden="true"></span>
+              <span class="hotspot-dot" aria-hidden="true"></span>
+            </a>
+          ))}
+        </nav>
+      </div>
     </div>
+
+    <header class="pavilion-header">
+      <a class="pavilion-brand" href="/" aria-label="Nyasha Mawungwe — home">Nyasha Mawungwe</a>
+      <a class="pavilion-about" href="/about/">About <span aria-hidden="true">↗</span></a>
+      <details class="pavilion-menu">
+        <summary aria-label="Navigation menu">
+          <svg class="menu-open" width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M0 2h26M0 10h26M0 18h26" /></svg>
+          <svg class="menu-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m5 5 14 14M5 19 19 5" /></svg>
+        </summary>
+        <nav aria-label="Mobile navigation">
+          <a href="/about/">About <span aria-hidden="true">↗</span></a>
+          {destinations.map((item) => <a href={item.href} data-panel={item.id}>{item.label} <span aria-hidden="true">↗</span></a>)}
+          <a href="/simple/">Simple view <span aria-hidden="true">↗</span></a>
+        </nav>
+      </details>
+    </header>
+
+    <div class="pavilion-intro">
+      <h1 id="greeting">Hi, I’m Nyasha.</h1>
+      <p>Building <a href="https://www.goveranai.com/en" target="_blank" rel="noopener noreferrer">goveranAI</a> and <a href="https://vhenekai.org/" target="_blank" rel="noopener noreferrer">VhenekAI</a>.</p>
+    </div>
+
+    <a class="pavilion-simple" href="/simple/">Simple view <span aria-hidden="true">↗</span></a>
+
+    <nav class="pavilion-mobile-links" aria-label="Explore my work">
+      {destinations.map((item) => <a href={item.href} data-panel={item.id}>{item.label}</a>)}
+    </nav>
   </section>
 
-  <p style="margin-top:1.5rem">
-    I'm a data analyst with a chemical-engineering background and a self-taught grounding in
-    machine learning. Right now I'm helping build production AI products while moving into
-    AI safety. I read widely and write down what I learn. You'll find my
-    <a href="/reviews">reviews</a> of books, papers and blogs, and my own
-    <a href="/blog">writing</a> here, and my full background on
-    <a href="/about">about</a>.
-  </p>
-
-  <h2>What I'm working on</h2>
-  <div class="cards">
-    {projects.map((p) => (
-      <a class="card" href={p.url} target="_blank" rel="noopener noreferrer">
-        <h3>{p.title}</h3>
-        <p>{p.description}</p>
-      </a>
-    ))}
-  </div>
-
-  {recentPosts.length > 0 && (
-    <>
-      <h2>Latest writing</h2>
-      <ul class="post-list">
-        {recentPosts.map((post) => (
-          <li>
-            <div class="post-item__meta">
-              <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
-            </div>
-            <h3 class="post-item__title"><a href={`/blog/${post.id}`}>{post.data.title}</a></h3>
-            <p class="post-item__summary">{post.data.description}</p>
-          </li>
-        ))}
-      </ul>
-      <p><a href="/blog">All posts →</a></p>
-    </>
-  )}
-
-  {recentReviews.length > 0 && (
-    <>
-      <h2>Recent reviews</h2>
-      <ul class="post-list">
-        {recentReviews.map((review) => (
-          <li>
-            <div class="post-item__meta">
-              <span class="chip">{review.data.kind}</span>
-              <time datetime={review.data.date.toISOString()}>{formatDate(review.data.date)}</time>
-            </div>
-            <h3 class="post-item__title"><a href={`/reviews/${review.id}`}>{review.data.title}</a></h3>
-            <p class="post-item__summary">{review.data.summary}</p>
-          </li>
-        ))}
-      </ul>
-      <p><a href="/reviews">All reviews →</a></p>
-    </>
-  )}
+  <PavilionPanels />
 </BaseLayout>
+
+<script>
+  import '../scripts/pavilion';
+</script>

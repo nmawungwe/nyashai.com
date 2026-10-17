@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { projects } from '../data/projects';
+---
+
+<BaseLayout title="Projects" description="What I’m working on: goveranAI and VhenekAI.">
+  <h1>What I’m working on</h1>
+  <div class="cards" style="margin-top: 2rem">
+    {projects.map((project) => (
+      <a class="card" href={project.url} target="_blank" rel="noopener noreferrer">
+        <h2 style="margin-top: 0">{project.title} <span aria-hidden="true">↗</span></h2>
+        <p>{project.description}</p>
+      </a>
+    ))}
+  </div>
+</BaseLayout>

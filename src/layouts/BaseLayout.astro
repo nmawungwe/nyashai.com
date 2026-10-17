@@ -6,16 +6,17 @@ import { site } from '../site';
 interface Props {
   title?: string;
   description?: string;
+  immersive?: boolean;
 }
 
-const { title, description = site.description } = Astro.props;
+const { title, description = site.description, immersive = false } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const year = new Date().getFullYear();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-pavilion={immersive || undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -32,10 +33,12 @@ const year = new Date().getFullYear();
     <meta name="twitter:card" content="summary" />
 
     <meta name="generator" content={Astro.generator} />
+    <slot name="head" />
 
     <!-- Apply the saved theme before paint to avoid a flash of the wrong mode. -->
     <script is:inline>
       (function () {
+        if (document.documentElement.hasAttribute('data-pavilion')) return;
         try {
           var t = localStorage.getItem('theme');
           if (t === 'light' || t === 'dark') {
@@ -45,12 +48,13 @@ const year = new Date().getFullYear();
       })();
     </script>
   </head>
-  <body>
-    <Nav />
-    <main class="wrap">
+  <body class={immersive ? 'pavilion-page' : undefined}>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    {!immersive && <Nav />}
+    <main id="main-content" class={immersive ? 'pavilion-main' : 'wrap'}>
       <slot />
     </main>
-    <footer class="site-footer">
+    {!immersive && <footer class="site-footer">
       <div class="wrap">
         <div class="social">
           {site.socials.map((s) => (
@@ -61,7 +65,7 @@ const year = new Date().getFullYear();
         </div>
         <p>© {year} {site.name}</p>
       </div>
-    </footer>
+    </footer>}
 
     <!-- Theme toggle: flips light/dark, persists the choice, syncs the icon. -->
     <script is:inline>

@@ -1,0 +1,54 @@
+---
+import { getHomeContent } from '../data/home';
+import { projects } from '../data/projects';
+import { formatDate } from '../utils';
+
+const { posts, reviews } = await getHomeContent();
+const sections = [
+  { id: 'projects', title: 'What I’m working on', link: '/projects/', all: 'All projects' },
+  { id: 'writing', title: 'Writing', link: '/blog/', all: 'All writing' },
+  { id: 'reviews', title: 'Reviews', link: '/reviews/', all: 'All reviews' },
+];
+---
+
+{sections.map((section) => (
+  <dialog class="pavilion-panel" id={`panel-${section.id}`} aria-labelledby={`heading-${section.id}`}>
+    <div class="panel-shell">
+      <div class="panel-topline">
+        <span>Nyasha Mawungwe</span>
+        <button class="panel-close" type="button" aria-label={`Close ${section.id}`} data-close-panel autofocus>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="m6 6 12 12M6 18 18 6" />
+          </svg>
+        </button>
+      </div>
+      <h2 id={`heading-${section.id}`}>{section.title}</h2>
+
+      {section.id === 'projects' && projects.map((project, index) => (
+        <article class="panel-entry">
+          <span class="panel-meta">0{index + 1} / {project.category}</span>
+          <h3><a href={project.url} target="_blank" rel="noopener noreferrer">{project.title}<span aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></h3>
+          <p>{project.description}</p>
+        </article>
+      ))}
+
+      {section.id === 'writing' && (posts.length ? posts.map((post) => (
+        <article class="panel-entry">
+          <time class="panel-meta" datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          <h3><a href={`/blog/${post.id}/`}>{post.data.title}<span aria-hidden="true"> ↗</span></a></h3>
+          <p>{post.data.description}</p>
+        </article>
+      )) : <p>No writing published yet.</p>)}
+
+      {section.id === 'reviews' && (reviews.length ? reviews.map((review) => (
+        <article class="panel-entry">
+          <div class="panel-meta">{review.data.kind}{review.data.author && <> · {review.data.author}</>}</div>
+          <h3><a href={`/reviews/${review.id}/`}>{review.data.title}<span aria-hidden="true"> ↗</span></a></h3>
+          <p>{review.data.summary}</p>
+        </article>
+      )) : <p>No reviews published yet.</p>)}
+
+      <a class="panel-all" href={section.link}>{section.all} <span aria-hidden="true">→</span></a>
+    </div>
+  </dialog>
+))}
