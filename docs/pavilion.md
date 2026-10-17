@@ -39,6 +39,25 @@ Project descriptions come from `src/data/projects.ts`. Writing/reviews come
 from `src/content/`, sorted by date, excluding drafts, at build time. Publishing
 new Markdown and rebuilding updates both the panels and Simple view.
 
+## Motion
+
+The scene settles in once over 1.2 seconds, with a short stagger for the greeting
+and object labels. Desktop selections add a 4.5% camera push toward the selected
+object; the object links remain on the same plane as the artwork. Closing the
+panel eases the camera back. Mobile keeps its composition still while the panel
+transitions. There are no perpetual animations or extra animation dependencies.
+
+Panels enter over 420ms and exit over 200ms, with a matching backdrop fade.
+`pavilion.ts` waits for the exit before closing the native dialog, keeping its
+focus trap intact. Close, Escape, and backdrop dismissal share this path;
+repeated close requests are ignored while an exit is pending. A reduced-motion
+preference change or a hidden tab finishes pending exits immediately. See the
+[native dialog cancel event](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/cancel_event).
+
+Reduced motion disables the entrance, camera push, pointer motion, hover lift,
+and panel/backdrop animations. No-JavaScript links and native mobile navigation
+remain available.
+
 ## Artwork provenance and prompt
 
 Created with the built-in imagegen tool from the user-approved Garden Pavilion

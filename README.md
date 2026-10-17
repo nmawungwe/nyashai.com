@@ -74,8 +74,10 @@ hidden. Without JavaScript, those links open their normal pages. `/simple/`
 provides the content without the scene. Mobile has a portrait composition,
 a native navigation menu, and larger links along the bottom.
 
-Parallax runs only in response to a mouse pointer on desktop, stops when idle,
-and respects reduced-motion preferences. Fonts are self-hosted and the scene
+The entrance plays once; selecting an object gently pushes the desktop camera
+closer while its panel opens. Panels ease out before focus returns. Pointer
+parallax stops when idle, and all transitions respect reduced-motion preferences.
+Fonts are self-hosted and the scene
 uses responsive WebP images; no third-party scripts or runtime requests are needed.
 See [design and artwork notes](docs/pavilion.md) for the approved copy, image
 provenance, and how object positions stay aligned.

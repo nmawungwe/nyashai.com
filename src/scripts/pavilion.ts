@@ -1,8 +1,39 @@
+import { createSceneMotion, reducedMotion } from './pavilion-motion';
+
 const pavilion = document.querySelector<HTMLElement>('.pavilion');
 const plane = document.querySelector<HTMLElement>('.scene-plane');
+const camera = document.querySelector<HTMLElement>('.scene-camera');
 const menu = document.querySelector<HTMLDetailsElement>('.pavilion-menu');
+const motion = pavilion && plane && camera ? createSceneMotion(pavilion, plane, camera) : null;
+const closing = new Map<HTMLDialogElement, Animation>();
 
-// Normal links are the fallback when JavaScript or <dialog> isn't available.
+// Keep the native modal open until its exit completes, preserving focus trapping.
+async function closePanel(dialog: HTMLDialogElement) {
+  if (!dialog.open || closing.has(dialog)) return;
+  if (reducedMotion.matches || typeof dialog.animate !== 'function' || document.hidden) {
+    dialog.close();
+    return;
+  }
+  const current = window.getComputedStyle(dialog);
+  dialog.dataset.closing = '';
+  const animation = dialog.animate([
+    { opacity: current.opacity, transform: current.transform },
+    { opacity: 0, transform: 'translateX(20px)' },
+  ], { duration: 200, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' });
+  closing.set(dialog, animation);
+  try {
+    await animation.finished;
+  } catch {
+    // Cancellation (including a changed motion preference) must still dismiss.
+  } finally {
+    if (dialog.open) dialog.close();
+    animation.cancel();
+    closing.delete(dialog);
+    delete dialog.dataset.closing;
+  }
+}
+
+// Normal links still work without JavaScript or native dialog support.
 if (typeof HTMLDialogElement !== 'undefined' && 'showModal' in HTMLDialogElement.prototype) {
   document.querySelectorAll<HTMLAnchorElement>('a[data-panel]').forEach((link) => {
     const dialog = document.getElementById(`panel-${link.dataset.panel}`);
@@ -12,8 +43,10 @@ if (typeof HTMLDialogElement !== 'undefined' && 'showModal' in HTMLDialogElement
     link.addEventListener('click', (event) => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
+      if (document.querySelector('.pavilion-panel[open]')) return;
       if (menu) menu.open = false;
       dialog.showModal();
+      motion?.focus(link.dataset.panel!);
       if (menu?.contains(link)) {
         dialog.addEventListener('close', () => {
           menu.querySelector<HTMLElement>('summary')?.focus();
@@ -23,66 +56,28 @@ if (typeof HTMLDialogElement !== 'undefined' && 'showModal' in HTMLDialogElement
   });
 
   document.querySelectorAll<HTMLDialogElement>('.pavilion-panel').forEach((dialog) => {
-    dialog.querySelector('[data-close-panel]')?.addEventListener('click', () => dialog.close());
+    dialog.querySelector('[data-close-panel]')?.addEventListener('click', () => void closePanel(dialog));
+    dialog.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      void closePanel(dialog);
+    });
+    dialog.addEventListener('close', () => motion?.reset());
     dialog.addEventListener('click', (event) => {
       if (event.target !== dialog) return;
       const bounds = dialog.getBoundingClientRect();
       if (event.clientX < bounds.left || event.clientX > bounds.right ||
-          event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+          event.clientY < bounds.top || event.clientY > bounds.bottom) void closePanel(dialog);
     });
   });
 }
 
-// Movement follows the pointer only: no perpetual animation or device sensors.
-// Object links move with the artwork so they remain attached to the right objects.
-if (pavilion && plane) {
-  const canMove = window.matchMedia('(prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) and (min-width: 1101px) and (min-aspect-ratio: 4/3)');
-  let x = 0;
-  let y = 0;
-  let targetX = 0;
-  let targetY = 0;
-  let frame = 0;
-
-  function animate() {
-    x += (targetX - x) * 0.075;
-    y += (targetY - y) * 0.075;
-    plane!.style.setProperty('--pan-x', `${x.toFixed(3)}px`);
-    plane!.style.setProperty('--pan-y', `${y.toFixed(3)}px`);
-    if (Math.abs(targetX - x) + Math.abs(targetY - y) > 0.025) {
-      frame = window.requestAnimationFrame(animate);
-    } else {
-      frame = 0;
-    }
-  }
-
-  function start() {
-    if (!frame) frame = window.requestAnimationFrame(animate);
-  }
-
-  pavilion.addEventListener('pointermove', (event) => {
-    if (!canMove.matches || document.querySelector('dialog[open]')) return;
-    targetX = (event.clientX / window.innerWidth - 0.5) * -12;
-    targetY = (event.clientY / window.innerHeight - 0.5) * -8;
-    start();
-  });
-  pavilion.addEventListener('pointerleave', () => {
-    targetX = targetY = 0;
-    if (canMove.matches) start();
-  });
-
-  function reset() {
-    window.cancelAnimationFrame(frame);
-    frame = x = y = targetX = targetY = 0;
-    plane!.style.removeProperty('--pan-x');
-    plane!.style.removeProperty('--pan-y');
-  }
-  canMove.addEventListener('change', reset);
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) reset();
-  });
+// Finish a pending exit promptly if motion is disabled or the tab is hidden.
+function finishExits() {
+  if (reducedMotion.matches || document.hidden) closing.forEach((animation) => animation.finish());
 }
+reducedMotion.addEventListener('change', finishExits);
+document.addEventListener('visibilitychange', finishExits);
 
-// Close the small mobile menu on outside click or Escape.
 document.addEventListener('click', (event) => {
   if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
 });

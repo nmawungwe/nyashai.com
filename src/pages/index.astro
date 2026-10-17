@@ -30,6 +30,7 @@ const destinations = [
 
   <section class="pavilion" aria-labelledby="greeting" style={`--desktop-ratio: ${desktop.width / desktop.height}; --mobile-ratio: ${mobile.width / mobile.height};`}>
     <div class="scene-viewport">
+      <div class="scene-camera">
       <div class="scene-plane">
         <picture>
           <source media="(max-aspect-ratio: 1/1)" srcset={portrait.srcset} sizes="100vw" width={mobile.width} height={mobile.height} />
@@ -45,6 +46,7 @@ const destinations = [
             </a>
           ))}
         </nav>
+      </div>
       </div>
     </div>
 
