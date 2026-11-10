@@ -3,8 +3,8 @@
 Personal site of Nyasha Mawungwe — built with [Astro](https://astro.build).
 Static Astro site with a garden-pavilion homepage, a short introduction,
 and object links to projects, writing, and reviews. The homepage uses optimized
-rendered artwork with subtle pointer parallax; other pages retain the warm
-"Sand & Terracotta" theme and automatic light/dark.
+rendered artwork with WebGL depth parallax (see `docs/pavilion.md`); reading pages share the pavilion’s paper palette, garden masthead and typography,
+with an optional saved dark reading mode.
 
 ## Run it
 
@@ -61,7 +61,9 @@ Your review in Markdown here.
 - **Home intro:** `src/pages/index.astro`
 - **Projects:** `src/data/projects.ts` (shared by the homepage panel, Projects, and Simple view)
 - **Homepage appearance and interaction:** `src/styles/pavilion.css`, `src/scripts/pavilion.ts`
-- **Scene artwork:** `src/assets/pavilion/`
+- **Scene artwork:** `src/assets/pavilion/` (the `-personal` variants are current)
+- **Reading pages:** `src/styles/reading.css`
+- **Project screenshots:** `src/assets/projects/`, rendered by `src/components/ProjectPreview.astro`
 - **Colors & fonts:** `src/styles/global.css` (CSS variables at the top)
 - **Profile photo:** replace `src/assets/profile.jpg`
 - **Domain (for canonical URLs):** `astro.config.mjs`
@@ -75,10 +77,16 @@ provides the content without the scene. Mobile has a portrait composition,
 a native navigation menu, and larger links along the bottom.
 
 The entrance plays once; selecting an object gently pushes the desktop camera
-closer while its panel opens. Panels ease out before focus returns. Pointer
-parallax stops when idle, and all transitions respect reduced-motion preferences.
-Fonts are self-hosted and the scene
-uses responsive WebP images; no third-party scripts or runtime requests are needed.
+closer while its panel opens. Panels ease out before focus returns. The scene
+keeps a slow idle sway and breeze, pausing behind panels and in hidden tabs;
+all motion respects reduced-motion preferences.
+Native same-origin page transitions add a short crossfade where supported;
+reduced motion uses ordinary navigation. Actual public website screenshots
+appear in the Projects panel and full Projects page. Simple view remains
+image-free. The scene features both projects and a printed copy of the published
+review’s subject.
+
+Fonts are self-hosted and the scene uses responsive WebP images; no third-party scripts or runtime requests are needed.
 See [design and artwork notes](docs/pavilion.md) for the approved copy, image
 provenance, and how object positions stay aligned.
 

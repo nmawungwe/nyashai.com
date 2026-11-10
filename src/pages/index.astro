@@ -2,8 +2,10 @@
 import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PavilionPanels from '../components/PavilionPanels.astro';
-import desktop from '../assets/pavilion/garden-desktop.webp';
-import mobile from '../assets/pavilion/garden-mobile.webp';
+import desktop from '../assets/pavilion/garden-desktop-personal.webp';
+import mobile from '../assets/pavilion/garden-mobile-personal.webp';
+import desktopDepth from '../assets/pavilion/garden-desktop-depth.webp';
+import mobileDepth from '../assets/pavilion/garden-mobile-depth.webp';
 import '../styles/pavilion.css';
 
 const responsive = async (src: typeof desktop, widths: number[]) => {
@@ -18,6 +20,12 @@ const [landscape, portrait] = await Promise.all([
   responsive(desktop, [960, 1440]),
   responsive(mobile, [480, 720]),
 ]);
+// Depth atlases come from scripts/bake-depth.py. `focal` is the worktable's depth,
+// which stays still; `focus` is where the camera travels without an object link.
+const scenes = {
+  landscape: { depth: desktopDepth.src, focal: 0.28, focus: [0.62, 0.6] },
+  portrait: { depth: mobileDepth.src, focal: 0.22, focus: [0.56, 0.63] },
+};
 const destinations = [
   { id: 'projects', label: 'Projects', href: '/projects/' },
   { id: 'writing', label: 'Writing', href: '/blog/' },
@@ -34,8 +42,9 @@ const destinations = [
       <div class="scene-plane">
         <picture>
           <source media="(max-aspect-ratio: 1/1)" srcset={portrait.srcset} sizes="100vw" width={mobile.width} height={mobile.height} />
-          <img src={landscape.src} srcset={landscape.srcset} sizes="100vw" width={desktop.width} height={desktop.height} alt="A sunlit garden pavilion, with a laptop on a wooden table, an open notebook, and books on a reading bench." fetchpriority="high" loading="eager" decoding="async" />
+          <img src={landscape.src} srcset={landscape.srcset} sizes="100vw" width={desktop.width} height={desktop.height} alt="A sunlit garden pavilion: goveranAI on the laptop, VhenekAI on the tablet, and a reading copy of The Adolescence of Technology by the books." fetchpriority="high" loading="eager" decoding="async" />
         </picture>
+        <canvas class="scene-canvas" aria-hidden="true" data-scenes={JSON.stringify(scenes)}></canvas>
 
         <nav class="scene-links" aria-label="Explore my work">
           {destinations.map((item) => (
