@@ -1,6 +1,6 @@
 ---
 read_when:
-  - Updating the pavilion homepage, artwork, object links, or homepage copy
+  - Updating the pavilion homepage, its 3D scene, object links, or homepage copy
 ---
 
 # Garden pavilion
@@ -18,31 +18,52 @@ remain the sources of biographical detail.
 
 ## Implementation
 
-The scene is pre-rendered artwork given real depth: a WebGL layer redraws the
-image through a baked depth map, so near rocks, the pavilion, the tree and the
-far hills move apart as the camera shifts. It is not a modelled 3D environment;
-the camera can lean a few percent, not walk around. The interface uses actual
-HTML text and links; no navigation or copy is baked into the images.
+The scene is a real 3D model: built procedurally in Blender, lit with Cycles,
+and drawn in the browser with three.js. All lighting is baked, so the browser
+draws unlit textures and vertex colours and the camera can truly move: it leans
+with the pointer and flies to the laptop, the notebook and the books. The
+interface uses actual HTML text and links; nothing is baked into the scene.
 
-`scripts/bake-depth.py` (run with `uv run scripts/bake-depth.py`) writes one
-`garden-*-depth.webp` atlas per composition: depth on top (Depth Anything V2
-Small, Apache-2.0), a foliage mask below. Re-run it whenever the artwork
-changes, then check `focal` in `index.astro`: it is the worktable's depth
-(0–1), the plane that stays still so the object links stay on their objects.
+Sources live in `blender/`:
 
-`pavilion-depth.ts` owns the canvas and shader (no library); `pavilion-motion.ts`
-owns the camera. The `<img>` remains the first paint and the fallback: without
-WebGL, on context loss, or with reduced motion the canvas stays hidden and the
-flat image keeps its small CSS pan. The atlas loads after the artwork, so it
-does not delay first paint. Drawing is capped at 3 megapixels and 2× density,
-and drops to 60% resolution if early frames run below about 40fps.
+- `build_scene.py` and `pavlib/` build `pavilion.blend` from scratch
+  (architecture, props, planting, cameras `cam_hero`, `cam_hero_portrait`,
+  `cam_projects`, `cam_writing`, `cam_reviews`, and the label anchors).
+- `bake_export.py` and `bakelib/` bake the lighting (texture atlases for
+  architecture, masonry, furniture and ground; per-leaf vertex colours for
+  planting) and export a GLB.
+- `export.sh` runs the lot and writes `public/pavilion/`: `pavilion.glb`
+  (meshopt + WebP, about 4 MB), `sky.webp`, `cameras.json`, and the two posters
+  `poster.webp` / `poster-portrait.webp`, which are Cycles renders of the hero
+  cameras.
 
-`index.astro` optimizes the two WebP source images at build time. The portrait
-artwork is selected for portrait and square viewports. Both compositions fill the
-viewport and align right to keep the reading bench visible, including on tall phones.
-The laptop, notebook, and books have object links positioned on the same
-coordinate plane as the desktop artwork. Move those coordinates in
-`pavilion.css` if replacing or reframing that image.
+```bash
+blender/export.sh --rebuild   # rebuild pavilion.blend, bake, export (about 10 min)
+blender/export.sh             # re-bake and export an existing pavilion.blend
+blender/export.sh --quick     # low-quality pipeline check
+```
+
+It needs Blender 5.x (`brew install --cask blender`; set `BLENDER` to override
+the path) and `npx`. `pavilion.blend` and `blender/.build/` are not committed;
+the scripts are the source. Planting is culled to the camera frustums, so moving
+a camera means a `--rebuild`. Textures are display-referred (AgX is applied at
+bake time), so the page uses no tone mapping.
+
+The distant hills are a matte painting (`pavlib/matte.py`): the clean hill areas
+of `garden-desktop-personal.webp` and `garden-mobile-personal.webp`, resampled
+onto a curved card 80 m out and feathered into the baked sky.
+
+On the page, `src/scripts/pavilion/` holds the scene: `index.ts` (wiring and
+lifecycle), `scene.ts` (loading, materials, breeze shader), `rig.ts` (camera
+poses, flights, framing) and `labels.ts` (HTML labels projected from the 3D
+anchors each frame). `pavilion-panels.ts` owns the dialogs. three.js is the one
+runtime dependency and loads as a separate chunk after first paint.
+
+The poster `<img>` is the first paint and the fallback: without WebGL, on
+context loss or if loading fails, it stays. The camera's projection matches the
+poster's `object-fit: cover` framing, so the hand-over is seamless. Landscape
+viewports use `cam_hero` and align right to keep the reading bench; portrait and
+square viewports use `cam_hero_portrait`.
 
 Native `<dialog>` panels provide focus trapping, Escape dismissal, and return
 focus to the triggering link. The visible links retain real destinations for
@@ -55,33 +76,40 @@ new Markdown and rebuilding updates both the panels and Simple view.
 
 ## Motion
 
-The scene settles in once over 1.2 seconds, with a short stagger for the greeting
-and object labels. Once the depth layer is ready it fades in over the identical
-image and its motion eases in over 1.8 seconds. The pointer leans the camera (up
-to 2% of the artwork width); a slow idle sway keeps the depth visible when the
-pointer rests and on touch screens, where it is stronger. Leaves sway in gentle
-travelling gusts. Tune these with the constants at the top of `pavilion-motion.ts`.
+The poster settles in once over 1.2 seconds, with a short stagger for the
+greeting. The 3D scene fades in over the identical poster once its first frame
+is drawn. The pointer leans the camera by a few centimetres; a slow idle drift
+keeps the depth visible when the pointer rests and on touch screens, where it is
+stronger. Leaves and grasses sway in a vertex-shader breeze. Tune these with the
+constants at the top of `rig.ts` and `scene.ts`.
 
-Opening a panel moves the camera forward towards the selected object over 900ms:
-a 4.5% push on desktop plus a depth dolly in which the foreground passes faster
-than the hills. Closing eases back. Behind an open panel the scene stops drawing
-once the camera arrives, and it pauses in a hidden tab. No animation libraries.
+Choosing a destination flies the camera to that object along a slight arc over
+1.6 seconds while the greeting and labels fade; the panel opens on arrival. The
+close-up is framed in the clear area beside the panel, or above it on phones,
+where the panel is a bottom sheet (62% of the height; keep `panelHeight` in
+`index.ts` and the rule in `pavilion.css` in step). Closing flies back. Behind
+an open panel the scene stops drawing once the camera arrives, and it pauses in
+a hidden tab.
 
 Panels enter over 420ms and exit over 200ms, with a matching backdrop fade.
-`pavilion.ts` waits for the exit before closing the native dialog, keeping its
-focus trap intact. Close, Escape, and backdrop dismissal share this path;
-repeated close requests are ignored while an exit is pending. A reduced-motion
-preference change or a hidden tab finishes pending exits immediately. See the
+`pavilion-panels.ts` waits for the exit before closing the native dialog,
+keeping its focus trap intact. Close, Escape, and backdrop dismissal share this
+path; repeated close requests are ignored while an exit is pending. A
+reduced-motion preference change or a hidden tab finishes pending exits
+immediately. See the
 [native dialog cancel event](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/cancel_event).
 
-Reduced motion disables the depth layer, entrance, camera push, pointer motion,
-idle sway, breeze, hover lift, and panel/backdrop animations. No-JavaScript links and native mobile navigation
-remain available.
+Reduced motion keeps the 3D scene but holds it still: no entrance, pointer lean,
+idle drift, breeze or flights (the camera cuts to the destination), and no hover
+lift or panel/backdrop animations. No-JavaScript links and native mobile
+navigation remain available.
 
 ## Artwork provenance and prompt
 
-Created with the built-in imagegen tool from the user-approved Garden Pavilion
-mockups. Original generated files remain in the chat's generated-image storage.
+The 3D scene was modelled after this artwork, which is no longer shown on the
+homepage itself. It remains the source of the matte-painted hills and of the
+reading pages' masthead. It was created with the built-in imagegen tool from
+the user-approved Garden Pavilion mockups. Original generated files remain in the chat's generated-image storage.
 The selected artwork is persisted in this repository:
 
 - `src/assets/pavilion/garden-desktop-personal.webp` — 1672 × 941

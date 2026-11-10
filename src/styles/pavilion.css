@@ -1,4 +1,4 @@
-/* The artwork and its object links share one coordinate plane. */
+/* Homepage: the baked 3D pavilion scene with HTML text, links and panels over it. */
 .pavilion-page {
   color-scheme: light;
   --accent: #9a452a;
@@ -15,49 +15,26 @@
   min-height: 22rem;
   isolation: isolate;
 }
-.scene-viewport {
+.scene-stage {
   position: absolute;
   inset: 0;
   overflow: hidden;
   background: linear-gradient(#d9e7eb, #f6f2e8 45%, #a0986c);
   z-index: -1;
-}
-.scene-camera {
-  position: absolute;
-  inset: 0;
-  transform: scale(1);
-  transform-origin: var(--focus-x, 60%) var(--focus-y, 60%);
-  transition: transform 900ms cubic-bezier(.22, 1, .36, 1);
   animation: scene-arrive 1200ms cubic-bezier(.22, 1, .36, 1) backwards;
 }
-@media (min-width: 1101px) and (min-aspect-ratio: 4/3) {
-  .pavilion[data-focus] .scene-camera { transform: scale(1.045); }
-}
-.scene-plane {
+/* Poster = the Cycles hero render, framed exactly like the 3D camera (cover;
+   landscape crops from the left to keep the reading bench). */
+.scene-stage picture, .scene-stage img, .scene-canvas {
   position: absolute;
-  right: 0;
-  top: 50%;
-  width: max(100vw, calc(100svh * var(--desktop-ratio)));
-  height: max(100svh, calc(100vw / var(--desktop-ratio)));
-  transform: translate(var(--pan-x, 0px), calc(-50% + var(--pan-y, 0px))) scale(1.015);
-  transform-origin: right center;
-  will-change: transform;
-}
-.scene-plane picture, .scene-plane img {
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
 }
-.scene-plane img { object-fit: fill; }
-/* Depth-rendered copy of the artwork; pavilion-motion.ts reveals it when ready. */
-.scene-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  pointer-events: none;
-}
+.scene-stage img { object-fit: cover; object-position: right center; }
+/* The live 3D scene; scripts/pavilion/index.ts reveals it once a frame is drawn. */
+.scene-canvas { opacity: 0; pointer-events: none; }
 .pavilion.is-live .scene-canvas { opacity: 1; transition: opacity 700ms ease; }
 .pavilion-header {
   position: absolute;
@@ -132,9 +109,11 @@
   text-decoration: none;
   animation: waypoint-arrive 600ms ease-out 300ms backwards;
 }
-.hotspot-projects { left: 60.4%; top: 59.7%; }
-.hotspot-writing { left: 85.8%; top: 69%; animation-delay: 380ms; }
-.hotspot-reviews { left: 96%; top: 65%; animation-delay: 460ms; }
+/* Labels are placed each frame from projected 3D anchors (left/top in px). */
+.scene-label { left: 0; top: 0; visibility: hidden; }
+/* While the camera visits an object the greeting and labels step aside. */
+.pavilion-intro, .scene-label { transition: opacity 450ms ease; }
+.pavilion[data-visiting] .pavilion-intro, .pavilion[data-visiting] .scene-label { opacity: 0; pointer-events: none; }
 .hotspot-label {
   display: inline-flex;
   justify-content: center;
@@ -180,9 +159,9 @@
   overscroll-behavior: contain;
 }
 .pavilion-panel[open] { animation: panel-arrive 420ms cubic-bezier(.22, 1, .36, 1); }
+/* The veil stays clear so the close-up beside the panel remains sharp. */
 .pavilion-panel::backdrop {
-  background: rgb(23 25 20 / 25%);
-  backdrop-filter: blur(3px);
+  background: rgb(23 25 20 / 8%);
   animation: veil-arrive 320ms ease-out;
 }
 .pavilion-panel[data-closing]::backdrop { animation: veil-depart 200ms ease-in forwards; }
@@ -259,12 +238,17 @@
   .pavilion-mobile-links a + a { border-left: 1px solid #dbd2c1; }
 }
 @media (max-aspect-ratio: 1/1) {
-  .scene-plane {
-    left: auto;
-    right: 0;
-    width: max(100vw, calc(100svh * var(--mobile-ratio)));
-    height: max(100svh, calc(100vw / var(--mobile-ratio)));
-    transform: translateY(-50%);
+  .scene-stage img { object-position: center; }
+  /* In the portrait framing the canopy sits behind the greeting; a soft paper
+     veil keeps it legible. */
+  .pavilion-intro::before {
+    content: '';
+    position: absolute;
+    inset: -1.25rem -1.5rem;
+    z-index: -1;
+    background: #faf6ebcc;
+    filter: blur(26px);
+    pointer-events: none;
   }
   .pavilion-intro { top: 13%; max-width: calc(100% - 2 * var(--page-inset)); }
   .pavilion-intro h1 { font-size: clamp(2.6rem, 8vw, 4.5rem); }
@@ -284,8 +268,12 @@
     pointer-events: none;
   }
 }
+/* On phones the panel is a bottom sheet, so the close-up stays visible above it
+   (the height matches panelHeight in scripts/pavilion/index.ts). */
+@media (max-width: 900px) and (max-aspect-ratio: 1/1) {
+  .pavilion-panel { width: calc(100% - 1rem); height: 62svh; margin: auto 0.5rem 0.5rem; }
+}
 @media (max-width: 480px) {
-  .pavilion-panel { width: calc(100% - 1rem); height: calc(100svh - 1rem); margin: 0.5rem; }
   .panel-shell h2 { font-size: 2.6rem; }
   .panel-entry h3 { font-size: 1.8rem; }
 }
@@ -297,9 +285,8 @@
   .pavilion-mobile-links { padding-block: 0.25rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .scene-plane { will-change: auto; }
-  .scene-camera, .pavilion[data-focus] .scene-camera { transform: none; transition: none; }
-  .scene-camera, .pavilion-header, .pavilion-intro h1, .pavilion-intro p,
+  .pavilion.is-live .scene-canvas, .pavilion-intro, .scene-label { transition: none; }
+  .scene-stage, .pavilion-header, .pavilion-intro h1, .pavilion-intro p,
   .scene-hotspot, .pavilion-menu nav, .pavilion-panel[open],
   .pavilion-panel::backdrop, .pavilion-panel[data-closing]::backdrop { animation: none; }
   .hotspot-label, .hotspot-dot { transition: none; }

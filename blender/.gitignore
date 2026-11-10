@@ -1,0 +1,5 @@
+*.blend1
+__pycache__/
+.build/
+# Rebuilt from the scripts by: blender/export.sh --rebuild
+pavilion.blend

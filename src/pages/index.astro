@@ -1,31 +1,9 @@
 ---
-import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PavilionPanels from '../components/PavilionPanels.astro';
-import desktop from '../assets/pavilion/garden-desktop-personal.webp';
-import mobile from '../assets/pavilion/garden-mobile-personal.webp';
-import desktopDepth from '../assets/pavilion/garden-desktop-depth.webp';
-import mobileDepth from '../assets/pavilion/garden-mobile-depth.webp';
 import '../styles/pavilion.css';
 
-const responsive = async (src: typeof desktop, widths: number[]) => {
-  const sizes = [...new Set([...widths.filter((width) => width < src.width), src.width])];
-  const images = await Promise.all(sizes.map((width) => getImage({ src, width, format: 'webp', quality: 85 })));
-  return {
-    src: images.at(-1)!.src,
-    srcset: images.map((image, index) => `${image.src} ${sizes[index]}w`).join(', '),
-  };
-};
-const [landscape, portrait] = await Promise.all([
-  responsive(desktop, [960, 1440]),
-  responsive(mobile, [480, 720]),
-]);
-// Depth atlases come from scripts/bake-depth.py. `focal` is the worktable's depth,
-// which stays still; `focus` is where the camera travels without an object link.
-const scenes = {
-  landscape: { depth: desktopDepth.src, focal: 0.28, focus: [0.62, 0.6] },
-  portrait: { depth: mobileDepth.src, focal: 0.22, focus: [0.56, 0.63] },
-};
+// Scene assets in public/pavilion/ are baked from blender/ (see docs/pavilion.md).
 const destinations = [
   { id: 'projects', label: 'Projects', href: '/projects/' },
   { id: 'writing', label: 'Writing', href: '/blog/' },
@@ -35,28 +13,26 @@ const destinations = [
 
 <BaseLayout immersive description="Nyasha Mawungwe. Building goveranAI and VhenekAI. Projects, writing, and reviews.">
   <link slot="head" rel="preload" href="/fonts/instrument-serif-regular.ttf" as="font" type="font/ttf" crossorigin />
+  <link slot="head" rel="preload" as="image" href="/pavilion/poster.webp" media="(min-aspect-ratio: 1001/1000)" fetchpriority="high" />
+  <link slot="head" rel="preload" as="image" href="/pavilion/poster-portrait.webp" media="(max-aspect-ratio: 1/1)" fetchpriority="high" />
 
-  <section class="pavilion" aria-labelledby="greeting" style={`--desktop-ratio: ${desktop.width / desktop.height}; --mobile-ratio: ${mobile.width / mobile.height};`}>
-    <div class="scene-viewport">
-      <div class="scene-camera">
-      <div class="scene-plane">
-        <picture>
-          <source media="(max-aspect-ratio: 1/1)" srcset={portrait.srcset} sizes="100vw" width={mobile.width} height={mobile.height} />
-          <img src={landscape.src} srcset={landscape.srcset} sizes="100vw" width={desktop.width} height={desktop.height} alt="A sunlit garden pavilion: goveranAI on the laptop, VhenekAI on the tablet, and a reading copy of The Adolescence of Technology by the books." fetchpriority="high" loading="eager" decoding="async" />
-        </picture>
-        <canvas class="scene-canvas" aria-hidden="true" data-scenes={JSON.stringify(scenes)}></canvas>
+  <section class="pavilion" aria-labelledby="greeting">
+    <div class="scene-stage">
+      <picture>
+        <source media="(max-aspect-ratio: 1/1)" srcset="/pavilion/poster-portrait.webp" width="828" height="1792" />
+        <img src="/pavilion/poster.webp" width="1672" height="941" alt="A sunlit garden pavilion: goveranAI on the laptop, VhenekAI on the tablet, and a reading copy of The Adolescence of Technology by the books." fetchpriority="high" loading="eager" decoding="async" />
+      </picture>
+      <canvas class="scene-canvas" aria-hidden="true"></canvas>
 
-        <nav class="scene-links" aria-label="Explore my work">
-          {destinations.map((item) => (
-            <a class={`scene-hotspot hotspot-${item.id}`} href={item.href} data-panel={item.id}>
-              <span class="hotspot-label">{item.label}</span>
-              <span class="hotspot-line" aria-hidden="true"></span>
-              <span class="hotspot-dot" aria-hidden="true"></span>
-            </a>
-          ))}
-        </nav>
-      </div>
-      </div>
+      <nav class="scene-links" aria-label="Explore my work">
+        {destinations.map((item) => (
+          <a class="scene-hotspot scene-label" href={item.href} data-panel={item.id}>
+            <span class="hotspot-label">{item.label}</span>
+            <span class="hotspot-line" aria-hidden="true"></span>
+            <span class="hotspot-dot" aria-hidden="true"></span>
+          </a>
+        ))}
+      </nav>
     </div>
 
     <header class="pavilion-header">
@@ -91,5 +67,5 @@ const destinations = [
 </BaseLayout>
 
 <script>
-  import '../scripts/pavilion';
+  import '../scripts/pavilion/index';
 </script>
