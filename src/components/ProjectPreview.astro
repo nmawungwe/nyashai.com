@@ -1,0 +1,23 @@
+---
+import { Image } from 'astro:assets';
+import type { projects } from '../data/projects';
+interface Props { project: typeof projects[number]; }
+const { project } = Astro.props;
+---
+
+<figure class="project-preview">
+  <a href={project.url} target="_blank" rel="noopener noreferrer" aria-label={`Visit ${project.title} (opens in a new tab)`}>
+    <Image src={project.preview} alt={project.previewAlt} widths={[480, 800, 1265]} sizes="(max-width: 600px) 100vw, 760px" format="webp" quality={85} loading="lazy" />
+    <span class="preview-caption"><span>{project.host}</span><span>Website preview <span aria-hidden="true">↗</span></span></span>
+  </a>
+</figure>
+
+<style>
+  .project-preview { margin: 1rem 0 1.5rem; }
+  .project-preview a { display: block; overflow: hidden; border: 1px solid var(--border, #dfd6c7); border-radius: 4px; color: inherit; background: #f7f4ec; text-decoration: none; }
+  .project-preview img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; }
+  .preview-caption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; align-items: center; padding: 0.65rem 0.8rem; border-top: 1px solid #dfd6c7; font: 400 0.68rem var(--font-sans); color: #5f6257; }
+  .preview-caption > span:last-child { color: #7b5140; }
+  a:hover { border-color: #a87a5b; }
+  a:hover .preview-caption > span:last-child { text-decoration: underline; text-underline-offset: 3px; }
+</style>

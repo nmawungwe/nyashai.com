@@ -16,8 +16,7 @@ const { Content } = await render(post);
 const { title, date, description, tags } = post.data;
 ---
 
-<BaseLayout title={title} description={description}>
-  <a class="back-link" href="/blog">← All posts</a>
+<BaseLayout title={title} description={description} returnHref="/blog/" returnLabel="All writing">
   <article>
     <h1>{title}</h1>
     <div class="article__meta">

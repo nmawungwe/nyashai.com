@@ -1,6 +1,7 @@
 ---
 import { getHomeContent } from '../data/home';
 import { projects } from '../data/projects';
+import ProjectPreview from './ProjectPreview.astro';
 import { formatDate } from '../utils';
 
 const { posts, reviews } = await getHomeContent();
@@ -27,6 +28,7 @@ const sections = [
       {section.id === 'projects' && projects.map((project, index) => (
         <article class="panel-entry">
           <span class="panel-meta">0{index + 1} / {project.category}</span>
+          <ProjectPreview project={project} />
           <h3><a href={project.url} target="_blank" rel="noopener noreferrer">{project.title}<span aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></h3>
           <p>{project.description}</p>
         </article>

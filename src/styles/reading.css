@@ -1,0 +1,72 @@
+/* The reading room shares the pavilion's paper, ink and generous typography. */
+.reading-page { min-height: 100svh; display: flex; flex-direction: column; }
+.reading-page .site-header { background: var(--bg); position: relative; z-index: 1; }
+.reading-page .site-header > .wrap { max-width: 76rem; padding-inline: clamp(1.25rem, 3.3vw, 4rem); }
+.reading-page .nav { min-height: 6rem; gap: 0.5rem 2rem; }
+.reading-page .nav__brand { font: 400 0.78rem var(--font-sans); letter-spacing: 0.2em; text-transform: uppercase; }
+.reading-page .nav__links { gap: clamp(0.75rem, 2vw, 1.8rem); font-size: 0.85rem; }
+.reading-page .nav__links a { min-height: 44px; display: inline-flex; align-items: center; position: relative; }
+.reading-page .nav__links a.is-active { font-weight: 400; color: var(--accent); }
+.reading-page .nav__links a.is-active::after { content: ''; position: absolute; bottom: 3px; left: 0; right: 0; height: 1px; background: currentColor; }
+.reading-page .theme-toggle { width: 44px; height: 44px; }
+.theme-toggle__sun { display: none; }
+:root[data-theme='dark'] .theme-toggle__sun { display: block; }
+:root[data-theme='dark'] .theme-toggle__moon { display: none; }
+.reading-landscape { position: relative; height: clamp(7rem, 15vw, 11rem); overflow: hidden; }
+.reading-landscape img { width: 100%; height: 100%; object-fit: cover; object-position: center 42%; opacity: 0.7; }
+.reading-landscape::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 10%, var(--bg)); }
+:root[data-theme='dark'] .reading-landscape img { opacity: 0.25; }
+.reading-main { flex: 1; max-width: 51rem; padding-block: 1rem 2rem; }
+.garden-return { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 1.75rem; color: var(--muted); font-size: 0.8rem; }
+.reading-main h1 { font-size: clamp(2.8rem, 6vw, 4.3rem); line-height: 1.06; letter-spacing: -0.025em; margin-bottom: 1.8rem; text-wrap: balance; }
+.reading-main h2 { font-size: clamp(2rem, 4vw, 2.7rem); margin-top: 3rem; }
+.reading-main h3 { font-size: 1.8rem; }
+.reading-main > .hero__tagline { margin: -0.7rem 0 2.75rem; max-width: 43ch; }
+.reading-main article > p { line-height: 1.85; }
+.reading-main article > h2 { margin-top: 2.5rem; }
+.reading-main .article__meta { padding-bottom: 1.75rem; border-bottom: 1px solid var(--border); margin-bottom: 2.25rem; }
+.reading-main .post-list { margin-top: 2rem; }
+.reading-main .post-list > li { border-top: 1px solid var(--border); padding-block: 1.75rem; margin: 0; }
+.reading-main .post-item__title { font-size: clamp(1.8rem, 4vw, 2.4rem); margin-block: 0.65rem; }
+.reading-main .post-item__summary { color: var(--muted); max-width: 60ch; }
+.reading-main .cv-entry { padding-block: 1.5rem; border-top: 1px solid var(--border); margin: 0; }
+.reading-main .cv-entry__org { margin-block: 0.35rem 0.7rem; }
+.reading-main .cv-entry__highlights { color: var(--muted); }
+.reading-main .chip { background: transparent; border-radius: 3px; font-size: 0.68rem; padding: 0.2rem 0.5rem; }
+.reading-main .skill-chips { margin-top: 2rem; }
+.reading-page .site-footer { margin-top: 3rem; padding-block: 2.25rem; font-size: 0.8rem; }
+.reading-page .site-footer > .wrap { max-width: 51rem; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 2rem; }
+.reading-page .site-footer p, .reading-page .site-footer .social { margin: 0; }
+.reading-page .social { flex-wrap: wrap; }
+.reading-page .social a { color: var(--muted); }
+.project-gallery { margin-top: 2.5rem; }
+.project-feature { padding-block: 2rem; border-top: 1px solid var(--border); }
+.project-feature h2 { margin: 1rem 0 0.75rem; }
+.project-feature h2 a { color: var(--text); }
+.project-feature p { color: var(--muted); max-width: 55ch; }
+.project-category { font-size: 0.75rem; letter-spacing: 0.04em; color: var(--muted); }
+@media (max-width: 40rem) {
+  .reading-page .nav { padding-block: 1rem; gap: 0.6rem; }
+  .reading-page .nav__brand { min-height: 32px; display: flex; align-items: center; }
+  .reading-page .nav__right { width: 100%; justify-content: space-between; gap: 0.5rem; }
+  .reading-page .nav__links { flex: 1; justify-content: space-between; gap: 0.5rem; font-size: 0.8rem; }
+  .reading-main { padding-inline: 1.5rem; }
+  .reading-landscape { height: 6rem; }
+  .garden-return { margin-bottom: 1rem; }
+  .reading-main h1 { font-size: clamp(2.5rem, 10vw, 3.5rem); }
+  .reading-main .cv-entry__period { white-space: normal; }
+  .reading-page .theme-toggle { border-color: transparent; }
+}
+/* Native document transitions preserve ordinary navigation and page scripts.
+   https://developer.mozilla.org/en-US/docs/Web/CSS/@view-transition */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root), ::view-transition-new(root) {
+    animation-duration: 220ms;
+    animation-timing-function: ease-out;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
+}

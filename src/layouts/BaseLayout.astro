@@ -1,5 +1,8 @@
 ---
 import '../styles/global.css';
+import '../styles/reading.css';
+import { Image } from 'astro:assets';
+import garden from '../assets/pavilion/garden-desktop-personal.webp';
 import Nav from '../components/Nav.astro';
 import { site } from '../site';
 
@@ -7,9 +10,11 @@ interface Props {
   title?: string;
   description?: string;
   immersive?: boolean;
+  returnHref?: string;
+  returnLabel?: string;
 }
 
-const { title, description = site.description, immersive = false } = Astro.props;
+const { title, description = site.description, immersive = false, returnHref = '/', returnLabel = 'Back to the garden' } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const year = new Date().getFullYear();
@@ -48,10 +53,14 @@ const year = new Date().getFullYear();
       })();
     </script>
   </head>
-  <body class={immersive ? 'pavilion-page' : undefined}>
+  <body class={immersive ? 'pavilion-page' : 'reading-page'}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     {!immersive && <Nav />}
-    <main id="main-content" class={immersive ? 'pavilion-main' : 'wrap'}>
+    {!immersive && Astro.url.pathname.replace(/\/$/, '') !== '/simple' && <div class="reading-landscape" aria-hidden="true">
+      <Image src={garden} alt="" width={1440} quality={75} loading="eager" />
+    </div>}
+    <main id="main-content" class={immersive ? 'pavilion-main' : 'wrap reading-main'}>
+      {!immersive && <a class="garden-return" href={returnHref}>← {returnLabel}</a>}
       <slot />
     </main>
     {!immersive && <footer class="site-footer">
@@ -67,23 +76,20 @@ const year = new Date().getFullYear();
       </div>
     </footer>}
 
-    <!-- Theme toggle: flips light/dark, persists the choice, syncs the icon. -->
+    <!-- Theme toggle: warm paper by default, with a saved dark reading mode. -->
     <script is:inline>
       (function () {
         var btn = document.querySelector('.theme-toggle');
         if (!btn) return;
-        var icon = btn.querySelector('.theme-toggle__icon');
-        var mq = window.matchMedia('(prefers-color-scheme: dark)');
 
         function current() {
           var set = document.documentElement.dataset.theme;
           if (set === 'light' || set === 'dark') return set;
-          return mq.matches ? 'dark' : 'light';
+          return 'light';
         }
         function render() {
           var c = current();
           // Show the mode you'd switch TO.
-          icon.textContent = c === 'dark' ? '☀️' : '🌙';
           btn.setAttribute(
             'aria-label',
             c === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
@@ -95,12 +101,6 @@ const year = new Date().getFullYear();
           try { localStorage.setItem('theme', next); } catch (e) {}
           render();
         });
-        // Keep the icon correct if the OS theme changes while on "system".
-        if (mq.addEventListener) {
-          mq.addEventListener('change', render);
-        } else if (mq.addListener) {
-          mq.addListener(render);
-        }
         render();
       })();
     </script>
